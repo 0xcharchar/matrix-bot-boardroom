@@ -1,0 +1,24 @@
+{
+  "name": "matrix-boardroom-bot",
+  "version": "0.1.0",
+  "description": "Matrix bot for viewing and alerting about Boardroom proposals",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js --ignore boardroom-bot.json",
+    "test": "tap"
+  },
+  "keywords": [
+    "matrix"
+  ],
+  "author": "0xcharchar",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "nodemon": "^2.0.12",
+    "tap": "^15.0.9"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "got": "^11.8.2",
+    "matrix-bot-sdk": "^0.5.19"
+  }
+}
