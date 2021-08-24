@@ -14,6 +14,14 @@ async function proposals (cname) {
   return data
 }
 
+async function proposal (refId) {
+  if (!refId) throw new Error('missing refId')
+
+  const { data } = await got(`${ROOT_URL}/proposals/${refId}`).json()
+  return data
+}
+
 module.exports = {
-  proposals
+  proposals,
+  proposal
 }

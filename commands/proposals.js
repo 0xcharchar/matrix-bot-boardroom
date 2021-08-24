@@ -1,6 +1,7 @@
 'use strict'
 
 const { RichReply } = require('matrix-bot-sdk')
+const ethers = require('ethers')
 const { proposals } = require('../boardroom')
 
 // !proposals [protocol]
@@ -14,23 +15,27 @@ async function handler (params, { roomId, event, storage }) {
     return reply
   }
 
+  // setup eth rpc provider
+  // TODO don't pin to single provider
+  const provider = new ethers.providers.AlchemyProvider('homestead', process.env.PROVIDER_TOKEN_ALCHEMY)
+
   // call proposals endpoint
   const proposalList = await proposals(cname)
 
   // extract refId, title, proposer, state
-  const messages = proposalList.map(p => {
+  const messages = (await Promise.all(proposalList.map(async p => {
     const votes = p.results.map(v => ({ count: v.total, choice: p.choices[v.choice] }))
 
     return {
       refId: p.refId,
       title: p.title,
-      proposer: p.proposer,
+      proposer: await provider.lookupAddress(p.proposer) || p.proposer,
       proposalUrl: `https://app.boardroom.info/${p.protocol}/proposal/${p.refId}`,
       votes
     }
-  }).map(p => {
+  }))).map(p => {
     let text = `${p.title} by ${p.proposer} at (${p.proposalUrl})`
-    let html = `<b><a href="${p.proposalUrl}">${p.title}</a></b> by <em>${p.proposer}</em>`
+    let html = `<b><a href="${p.proposalUrl}">${p.title} (${p.refId})</a></b> by <em>${p.proposer}</em>`
 
     return { text, html }
   }).reduce((condensed, current) => {
@@ -38,7 +43,7 @@ async function handler (params, { roomId, event, storage }) {
     condensed.html = `${condensed.html}<li>${current.html}</li>`
 
     return condensed
-  }, { text: '', html: '<ul>' })
+  }, { text: '', html: '<p>Proposals:</p><ul>' })
 
   messages.html = `${messages.html}</ul>`
 
