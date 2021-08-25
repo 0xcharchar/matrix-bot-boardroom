@@ -6,7 +6,7 @@ const { proposals } = require('../boardroom')
 
 // !proposals [protocol]
 async function handler (params, { roomId, event, storage }) {
-  let cname = params[0] || await storage.readValue('protocol')
+  const cname = params[0] || await storage.readValue('protocol')
 
   if (!cname) {
     const message = 'No protocol set. Either use `!config protocol your-protocol` or `!proposals your-protocol`'
@@ -34,8 +34,8 @@ async function handler (params, { roomId, event, storage }) {
       votes
     }
   }))).map(p => {
-    let text = `${p.title} by ${p.proposer} at (${p.proposalUrl})`
-    let html = `<b><a href="${p.proposalUrl}">${p.title} (${p.refId})</a></b> by <em>${p.proposer}</em>`
+    const text = `${p.title} by ${p.proposer} at (${p.proposalUrl})`
+    const html = `<b><a href="${p.proposalUrl}">${p.title} (${p.refId})</a></b> by <em>${p.proposer}</em>`
 
     return { text, html }
   }).reduce((condensed, current) => {

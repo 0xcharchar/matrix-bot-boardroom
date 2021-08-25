@@ -6,7 +6,7 @@ const { proposal } = require('../boardroom')
 
 // !proposal [refId]
 async function handler (params, { roomId, event, storage }) {
-  let [refId] = params
+  const [refId] = params
 
   if (!refId) {
     const message = 'Missing the proposal ID. Usage: `!proposal proposalId`'

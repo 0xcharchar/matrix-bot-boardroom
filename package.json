@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js --ignore boardroom-bot.json",
+    "lint": "standard",
     "test": "tap"
   },
   "keywords": [
@@ -14,6 +15,7 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "nodemon": "^2.0.12",
+    "standard": "^16.0.3",
     "tap": "^15.0.9"
   },
   "dependencies": {
