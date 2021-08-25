@@ -134,20 +134,27 @@ async function connect (shouldRegister = false) {
 
   const commands = await loadCommands()
 
-  let client
+  const storage = new SimpleFsStorageProvider('boardroom-bot.json')
+  const isRegistered = !!(await storage.readValue('isRegistered'))
 
+  let client
   try {
-    const storage = new SimpleFsStorageProvider('boardroom-bot.json')
-    client = await passwordLogin(MATRIX_HOMESERVER_URL, MATRIX_BOT_USERNAME, MATRIX_BOT_PASSWORD, storage)
-    console.log('client connected', await client.getUserId())
+    if (isRegistered) {
+      client = await passwordLogin(MATRIX_HOMESERVER_URL, MATRIX_BOT_USERNAME, MATRIX_BOT_PASSWORD, storage)
+    } else {
+      client = await register(MATRIX_HOMESERVER_URL, MATRIX_BOT_USERNAME, MATRIX_BOT_PASSWORD, storage)
+      await storage.storeValue('isRegistered', true)
+    }
   } catch (err) {
-    console.log('dun goofed', err)
+    client = await passwordLogin(MATRIX_HOMESERVER_URL, MATRIX_BOT_USERNAME, MATRIX_BOT_PASSWORD, storage)
   }
   AutojoinRoomsMixin.setupOnClient(client)
 
   client.on('room.message', handleCommand(client, commands))
 
-  client.start().then(() => console.log(`Connected to ${MATRIX_HOMESERVER_URL}`))
+  await client.start()
+  const userId = await client.getUserId()
+  console.log(`Connected to ${MATRIX_HOMESERVER_URL} as ${userId}`)
 }
 
 module.exports = connect
