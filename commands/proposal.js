@@ -3,6 +3,7 @@
 const { RichReply } = require('matrix-bot-sdk')
 const ethers = require('ethers')
 const { proposal } = require('../boardroom')
+const messaging = require('../matrix/messaging')
 
 // !proposal [refId]
 async function handler (params, { roomId, event, storage }) {
@@ -10,9 +11,7 @@ async function handler (params, { roomId, event, storage }) {
 
   if (!refId) {
     const message = 'Missing the proposal ID. Usage: `!proposal proposalId`'
-    const reply = RichReply.createFor(roomId, event, message, message)
-    reply.msgtype = 'm.notice'
-    return reply
+    return messaging.errors({ name: 'Error', message }, { roomId, event })
   }
 
   // setup eth rpc provider
