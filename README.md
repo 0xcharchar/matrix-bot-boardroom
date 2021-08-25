@@ -19,7 +19,7 @@ This is a developer-only tool at the moment and has not been packaged in a frien
 1. Clone the repository
 2. Create a `.env` file in the root of the project, filling in these variables
     ```sh
-    MATRIX_HOMESERVER_URL=
+    MATRIX_HOMESERVER_URL=http://localhost:8008
     MATRIX_BOT_USERNAME=boardroom_bot
     MATRIX_BOT_PASSWORD=demobot
     PROVIDER_TOKEN_ALCHEMY=
@@ -28,7 +28,7 @@ This is a developer-only tool at the moment and has not been packaged in a frien
 
 ## Usage
 
-Starting the bot for the first time will register it (TODO need to bring this back).
+Starting the bot for the first time will register it.
 
 1. Start the bot: `npm run dev`
 2. In the Matrix client of your choice, invite **@boardroom_bot:your.server.com**
