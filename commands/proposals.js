@@ -22,7 +22,7 @@ async function handler (params, { roomId, event, storage }) {
   const proposalList = await proposals(cname)
 
   // extract refId, title, proposer, state
-  const messages = (await Promise.all(proposalList.map(async p => {
+  const partialProposals = await Promise.all(proposalList.map(async p => {
     const votes = p.results.map(v => ({ count: v.total, choice: p.choices[v.choice] }))
 
     return {
@@ -32,8 +32,12 @@ async function handler (params, { roomId, event, storage }) {
       proposalUrl: `https://app.boardroom.info/${p.protocol}/proposal/${p.refId}`,
       votes
     }
-  }))).map(p => {
-    const text = `${p.title} by ${p.proposer} at (${p.proposalUrl})`
+  }))
+
+  await storage.storeValue('lastProposalId', partialProposals[0].refId)
+
+  const messages = partialProposals.map(p => {
+    const text = `${p.title} by ${p.proposer}, see: ${p.proposalUrl}`
     const html = `<b><a href="${p.proposalUrl}">${p.title} (${p.refId})</a></b> by <em>${p.proposer}</em>`
 
     return { text, html }
@@ -42,7 +46,7 @@ async function handler (params, { roomId, event, storage }) {
     condensed.html = `${condensed.html}<li>${current.html}</li>`
 
     return condensed
-  }, { text: '', html: '<p>Proposals:</p><ul>' })
+  }, { text: 'Proposals:\n', html: '<p>Proposals:</p><ul>' })
 
   messages.html = `${messages.html}</ul>`
 

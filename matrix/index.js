@@ -110,7 +110,13 @@ function handleCommand (client, commands) {
 
     if (!commands[command]) return
 
-    const reply = await commands[command](messageParts, { roomId, event, storage: client.storageProvider })
+    const context = {
+      roomId,
+      event,
+      storage: client.storageProvider,
+      _client: client
+    }
+    const reply = await commands[command](messageParts, context)
 
     client.sendMessage(roomId, reply)
   }
