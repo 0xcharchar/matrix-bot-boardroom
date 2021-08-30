@@ -42,7 +42,7 @@ async function handler (params, { roomId, event, storage }) {
 
     return { text, html }
   }).reduce((condensed, current) => {
-    condensed.text = `${condensed.text}\n${current.text}`
+    condensed.text = `${condensed.text}\n* ${current.text}`
     condensed.html = `${condensed.html}<li>${current.html}</li>`
 
     return condensed

@@ -7,6 +7,9 @@ const {
 } = require('matrix-bot-sdk')
 const fs = require('fs/promises')
 const path = require('path')
+const BotStorage = require('./storage')
+
+let logger
 
 // Mostly ripped from MatrixAuth, this version allows passing in a storage option
 async function passwordLogin (host, username, password, storage = null, deviceName = null) {
@@ -93,9 +96,9 @@ async function register (host, username, password, storage = null, deviceName = 
 }
 
 function handleCommand (client, commands) {
-  console.log('the commands', commands)
+  logger.debug({ commands }, 'Loaded commands')
   return async (roomId, event) => {
-    console.log('entered handler', roomId, event)
+    logger.debug({ roomId, event }, 'Entered handler')
     if (!event.content) return
 
     if (event.content.msgtype !== 'm.text') return
@@ -113,6 +116,7 @@ function handleCommand (client, commands) {
     const context = {
       roomId,
       event,
+      logger,
       storage: client.storageProvider,
       _client: client
     }
@@ -135,8 +139,10 @@ async function loadCommands (commandsDir = 'commands') {
   return commands
 }
 
-async function connect (shouldRegister = false) {
+async function connect (_logger) {
   const { MATRIX_HOMESERVER_URL, MATRIX_BOT_USERNAME, MATRIX_BOT_PASSWORD } = process.env
+
+  logger = _logger
 
   const commands = await loadCommands()
 
@@ -156,11 +162,13 @@ async function connect (shouldRegister = false) {
   }
   AutojoinRoomsMixin.setupOnClient(client)
 
+  BotStorage(client.storageProvider)
+
   client.on('room.message', handleCommand(client, commands))
 
   await client.start()
   const userId = await client.getUserId()
-  console.log(`Connected to ${MATRIX_HOMESERVER_URL} as ${userId}`)
+  logger.info({ host: MATRIX_HOMESERVER_URL, userId }, 'Connected')
 }
 
 module.exports = connect

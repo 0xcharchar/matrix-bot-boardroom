@@ -7,15 +7,15 @@ const messaging = require('./messaging')
 
 const ONE_MINUTE = 60000 // milliseconds
 
-async function startProposalEvent (protocol, { roomId, _client }) {
+async function startProposalEvent (protocol, { roomId, _client, logger }) {
   if (!protocol) return messaging.errors({ name: 'Error', message: 'Missing protocol, cannot check for proposals' }, { roomId, event })
 
   const provider = new ethers.providers.AlchemyProvider('homestead', process.env.PROVIDER_TOKEN_ALCHEMY)
   const storage = _client.storageProvider
 
-  const alreadyRunning = !!(await storage.readValue('proposalCheckId'))
+  const alreadyRunning = await storage.readValue('proposalCheckId')
   if (alreadyRunning) {
-    console.warn('new-proposal events already enabled')
+    logger.warn('new-proposal events already enabled')
     return
   }
 
@@ -23,11 +23,8 @@ async function startProposalEvent (protocol, { roomId, _client }) {
     const lastProposalId = await storage.readValue('lastProposalId')
     const data = await proposals(protocol)
 
-    console.log('we heeere')
-
     let idx = 0
     for (idx = 0; idx < data.length; idx += 1) {
-      console.log('we heeere ', idx)
       const proposal = data[idx]
       if (proposal.refId === lastProposalId) break
 
@@ -44,9 +41,8 @@ async function startProposalEvent (protocol, { roomId, _client }) {
     }
 
     if (idx > 0) await storage.storeValue('lastProposalId', data[0].refId)
-    else console.log('No new proposals')
+    else logger.info('No new proposals')
 
-    console.log('we heeere at the end')
   }, ONE_MINUTE * 5)
 
   await storage.storeValue('proposalCheckId', intervalId[Symbol.toPrimitive]())
@@ -56,6 +52,7 @@ async function startProposalEvent (protocol, { roomId, _client }) {
 async function stopProposalEvent ({ storage }) {
   const proposalCheckId = await storage.readValue('proposalCheckId')
   if (proposalCheckId) clearInterval(proposalCheckId)
+  await storage.storeValue('proposalCheckId', '')
 }
 
 module.exports = {
