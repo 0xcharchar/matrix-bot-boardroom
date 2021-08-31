@@ -36,7 +36,7 @@ Starting the bot for the first time will register it.
 
 ## Commands
 
-### `!proposals <protocol>`
+### `!proposals <protocol-name>`
 
 Prints the last 25 proposals from given protocol. Each proposal will have the proposer address or ENS, the title of the proposal, and a link back to Boardroom
 
@@ -44,3 +44,14 @@ Prints the last 25 proposals from given protocol. Each proposal will have the pr
 
 Get the details of a single proposal.
 
+### `!voter <addressOrENS>`
+
+Show how a user, using their wallet address or ENS, has voted in the past.
+
+### `!config protocol <protocol-name>`
+
+Set the protocol to use when `!proposals` is called without an argument. This protocol is also used for automated alerts into the channel.
+
+### `!alerts <enable|disable> new-proposals`
+
+Currently only one alert option: `new-proposals`. This will check every five minutes for new proposals for the `!config`ured protocol. If someone calls `!proposals` between checks and there is a new proposal, the bot will not send an alert to the channel.

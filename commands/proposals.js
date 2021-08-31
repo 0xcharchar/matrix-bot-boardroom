@@ -7,7 +7,8 @@ const messaging = require('../matrix/messaging')
 
 // !proposals [protocol]
 async function handler (params, { roomId, event, storage }) {
-  const cname = params[0] || await storage.readValue('protocol')
+  const storedProtocol = await storage.readValue('protocol')
+  const cname = params[0] || storedProtocol
 
   if (!cname) {
     const message = 'No protocol set. Either use `!config protocol your-protocol` or `!proposals your-protocol`'
@@ -34,7 +35,9 @@ async function handler (params, { roomId, event, storage }) {
     }
   }))
 
-  await storage.storeValue('lastProposalId', partialProposals[0].refId)
+  if (storedProtocol && storedProtocol === cname) {
+    await storage.storeValue('lastProposalId', partialProposals[0].refId)
+  }
 
   const messages = partialProposals.map(p => {
     const text = `${p.title} by ${p.proposer}, see: ${p.proposalUrl}`
