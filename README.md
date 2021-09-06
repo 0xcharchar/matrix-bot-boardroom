@@ -2,7 +2,9 @@
 
 Get proposals, votes, and voter information from [Boardroom](https://boardroom.info/) straight to your Matrix server.
 
-![the !proposals and !proposal commands](docs/bot-proposals.jpg)
+**[Watch the demo video](https://peertube.co.uk/videos/watch/e1e2783c-d2c2-4899-868d-32e0c84938b8)**
+
+[![the !proposals and !proposal commands](docs/bot-proposals.jpg)](https://peertube.co.uk/videos/watch/e1e2783c-d2c2-4899-868d-32e0c84938b8)
 
 ## Requirements
 
